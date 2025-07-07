@@ -9,6 +9,9 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
+/.idea/
+.DS_Store
+
 ###> phpunit/phpunit ###
 /phpunit.xml
 /.phpunit.cache/
@@ -18,3 +21,7 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
