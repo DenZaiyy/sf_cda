@@ -1,0 +1,54 @@
+services:
+    php:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: frankenphp
+        restart: always
+        ports:
+            - "8080:80"
+            - "443:443"
+            - "443:443/udp"
+        networks:
+            - sf-network
+        volumes:
+            - ./:/app
+            - caddy_data:/data
+            - caddy_config:/config
+        depends_on:
+            - mysql
+        tty: true
+
+    mysql:
+        image: mysql:8.0
+        restart: always
+        container_name: mysql
+        environment:
+            MYSQL_DATABASE: symfonycda
+            MYSQL_ROOT_PASSWORD: symfonycda
+        ports:
+            - "33336:3306"
+        networks:
+            - sf-network
+        volumes:
+            - database_data:/var/lib/mysql:rw
+        platform: linux/arm64/v8
+
+    mailer:
+        image: mailhog/mailhog:latest
+        container_name: mailer
+        restart: always
+        ports:
+            - "1025:1025" # SMTP
+            - "8025:8025" # Web UI
+        networks:
+            - sf-network
+
+volumes:
+    caddy_data:
+    caddy_config:
+    database_data:
+
+networks:
+    sf-network:
+        driver: bridge
