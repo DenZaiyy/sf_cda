@@ -20,6 +20,7 @@ security:
             provider: app_user_provider
             custom_authenticators:
                 - App\Security\GoogleAuthenticator
+                - App\Security\GithubAuthenticator
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -33,8 +34,8 @@ security:
                 target: auth.oauth.login
 
             form_login:
-                login_path: app_login
-                check_path: app_login
+                login_path: auth.oauth.login
+                check_path: auth.oauth.login
                 enable_csrf: true
 
     # Easy way to control access for large sections of your site
