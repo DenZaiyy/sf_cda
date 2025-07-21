@@ -2,7 +2,7 @@ services:
     php:
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: ${DOCKERFILE:-Dockerfile}
         container_name: frankenphp
         restart: always
         ports:
@@ -15,6 +15,8 @@ services:
             - ./:/app
             - caddy_data:/data
             - caddy_config:/config
+        environment:
+            - DATABASE_URL=mysql://root:symfonycda@mysql:3306/symfonycda
         depends_on:
             - mysql
         tty: true
