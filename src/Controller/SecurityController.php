@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\OAuthProviderService;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -11,11 +12,6 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-    public const SCOPES = [
-        'google' => [],
-        'github' => ['user:email'],
-    ];
-
     #[Route('/login', name: "auth.oauth.login", methods: ['GET', 'POST'])]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -42,15 +38,16 @@ class SecurityController extends AbstractController
     }
 
     #[Route('/oauth/connect/{service}', name: 'auth.oauth.connect', methods: ['GET'])]
-    public function connect(string $service, ClientRegistry $clientRegistry): RedirectResponse
+    public function connect(string $service, ClientRegistry $clientRegistry, OAuthProviderService $OAuthProviderService): RedirectResponse
     {
-        if (!array_key_exists($service, self::SCOPES)) {
-            throw $this->createNotFoundException();
+        if (!$OAuthProviderService->isValidProvider($service)) {
+            throw $this->createNotFoundException("Service OAuth inconnu");
         }
 
-        return $clientRegistry
-            ->getClient($service)
-            ->redirect(self::SCOPES[$service]);
+        $scopes = $OAuthProviderService->getScopes($service);
+
+        return $clientRegistry->getClient($service)->redirect($scopes);
+
     }
 
     #[Route('/oauth/check/{service}', name: 'auth.oauth.check', methods: ['GET', 'POST'])]
