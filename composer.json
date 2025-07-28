@@ -106,6 +106,7 @@
     },
     "require-dev": {
         "dbrekelmans/bdi": "^1.4",
+        "doctrine/doctrine-fixtures-bundle": "^4.1",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^12.2",
         "rector/rector": "^2.0",
