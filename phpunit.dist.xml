@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- https://phpunit.readthedocs.io/en/latest/configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          colors="true"
@@ -38,6 +37,14 @@
             <function>trigger_deprecation</function>
         </deprecationTrigger>
     </source>
+
+    <coverage>
+        <report>
+            <html outputDirectory="coverage" />
+            <!-- Optional: also generate Clover report for CI -->
+            <!-- <clover outputFile="coverage/clover.xml"/> -->
+        </report>
+    </coverage>
 
     <extensions>
         <bootstrap class="Symfony\Component\Panther\ServerExtension" />
