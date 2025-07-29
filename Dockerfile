@@ -9,4 +9,7 @@ RUN install-php-extensions \
   zip \
   opcache
 
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug
+
 WORKDIR /app
