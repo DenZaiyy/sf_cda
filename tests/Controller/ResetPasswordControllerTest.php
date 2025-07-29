@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
@@ -61,7 +61,7 @@ class ResetPasswordControllerTest extends WebTestCase
         // self::assertQueuedEmailCount(1);
         self::assertEmailCount(1);
 
-        self::assertCount(1, $messages = $this->getMailerMessages());
+        self::assertCount(1, $messages = self::getMailerMessages());
 
         self::assertEmailAddressContains($messages[0], 'from', 'info@denzaiyy.fr');
         self::assertEmailAddressContains($messages[0], 'to', 'me@example.com');
