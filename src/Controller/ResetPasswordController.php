@@ -161,7 +161,7 @@ class ResetPasswordController extends AbstractController
             //     $translator->trans($e->getReason(), [], 'ResetPasswordBundle')
             // ));
 
-            return $this->redirectToRoute('app_check_email');
+            return $this->redirectToRoute('app.check.email');
         }
 
         $email = (new TemplatedEmail())
