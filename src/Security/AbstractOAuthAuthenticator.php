@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -64,6 +65,11 @@ abstract class AbstractOAuthAuthenticator extends OAuth2Authenticator
     public function authenticate(Request $request): Passport
     {
         $credentials = $this->fetchAccessToken($this->getClient());
+
+        if (!$credentials instanceof AccessToken) {
+            throw new AuthenticationException('Invalid access token.');
+        }
+
         $resourceOwner = $this->getResourceOwnerFromCredentials($credentials);
         $user = $this->getUserFromResourceOwner($resourceOwner, $this->repository);
 

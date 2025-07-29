@@ -14,6 +14,10 @@ final class OAuthProviderService
         return array_key_exists($provider, self::SCOPES);
     }
 
+    /**
+     * @param string $provider
+     * @return list<string>
+     */
     public function getScopes(string $provider): array
     {
         if (!$this->isValidProvider($provider)) {
@@ -23,6 +27,9 @@ final class OAuthProviderService
         return self::SCOPES[$provider];
     }
 
+    /**
+     * @return list<string>
+     */
     public function getAvailableProviders(): array
     {
         return array_keys(self::SCOPES);

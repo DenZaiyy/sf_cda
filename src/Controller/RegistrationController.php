@@ -22,7 +22,8 @@ class RegistrationController extends AbstractController
     public function __construct(
         private readonly EmailVerifier $emailVerifier,
         private readonly UserRegistrationService $userRegistrationService
-    ) { }
+    ) {
+    }
 
     #[Route('/register', name: 'app.register')]
     public function register(Request $request): Response
@@ -36,8 +37,12 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->userRegistrationService->register($user, $form->get('plainPassword')->getData());
-            return $this->redirectToRoute('app.home');
+            $password = $form->get('plainPassword')->getData();
+
+            if (is_string($password)) {
+                $this->userRegistrationService->register($user, $password);
+                return $this->redirectToRoute('app.home');
+            }
         }
 
         return $this->render('registration/register.html.twig', [

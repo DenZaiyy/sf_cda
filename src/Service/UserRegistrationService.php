@@ -15,7 +15,8 @@ final class UserRegistrationService
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly EntityManagerInterface      $em,
         private readonly EmailVerifier               $emailVerifier,
-    ) {}
+    ) {
+    }
 
     public function register(User $user, string $plainPassword): void
     {
@@ -23,7 +24,9 @@ final class UserRegistrationService
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->emailVerifier->sendEmailConfirmation('app.verify.email', $user,
+        $this->emailVerifier->sendEmailConfirmation(
+            'app.verify.email',
+            $user,
             (new TemplatedEmail())
                 ->from(new Address('info@denzaiyy.fr', 'DenZaiyy'))
                 ->to((string) $user->getEmail())

@@ -46,8 +46,7 @@ class SecurityController extends AbstractController
 
         $scopes = $OAuthProviderService->getScopes($service);
 
-        return $clientRegistry->getClient($service)->redirect($scopes);
-
+        return $clientRegistry->getClient($service)->redirect($scopes, []);
     }
 
     #[Route('/oauth/check/{service}', name: 'auth.oauth.check', methods: ['GET', 'POST'])]

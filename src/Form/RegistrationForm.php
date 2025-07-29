@@ -33,7 +33,7 @@ class RegistrationForm extends AbstractType
                 'type' => PasswordType::class,
                 'attr' => ['autocomplete' => 'new-password'],
                 'first_options' => [
-                    'label'=> 'Password',
+                    'label' => 'Password',
                     'label_attr' => ['class' => 'block text-sm font-medium text-gray-700 dark:text-white'],
                     'attr' => [
                         'autocomplete' => 'new-password',
