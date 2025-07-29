@@ -4,31 +4,45 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Service\OAuthProviderService;
+use PHPUnit\Framework\TestCase;
 
-class OAuthProviderServiceTest extends WebTestCase
+class OAuthProviderServiceTest extends TestCase
 {
-    public function testGoogleOAuthRedirect(): void
+    private OAuthProviderService $service;
+
+    protected function setUp(): void
     {
-        $client = static::createClient();
-
-        $client->request('GET', '/oauth/connect/google');
-
-        self::assertResponseRedirects();
-        $location = $client->getResponse()->headers->get('Location');
-        $this->assertStringContainsString('accounts.google.com', $location);
-        $this->assertStringContainsString('oauth2', $location);
+        $this->service = new OAuthProviderService();
     }
 
-    public function testGitHubOAuthRedirect(): void
+    public function testIsValidProviderReturnsTrueForKnownProviders(): void
     {
-        $client = static::createClient();
+        $this->assertTrue($this->service->isValidProvider('google'));
+        $this->assertTrue($this->service->isValidProvider('github'));
+    }
 
-        $client->request('GET', '/oauth/connect/github');
+    public function testIsValidProviderReturnsFalseForUnknownProvider(): void
+    {
+        $this->assertFalse($this->service->isValidProvider('facebook'));
+    }
 
-        self::assertResponseRedirects();
-        $location = $client->getResponse()->headers->get('Location');
-        $this->assertStringContainsString('github.com', $location);
-        $this->assertStringContainsString('oauth', $location);
+    public function testGetScopesReturnsCorrectScopes(): void
+    {
+        $this->assertSame([], $this->service->getScopes('google'));
+        $this->assertSame(['user:email'], $this->service->getScopes('github'));
+    }
+
+    public function testGetScopesThrowsExceptionForInvalidProvider(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Provider non reconnu : facebook');
+        $this->service->getScopes('facebook');
+    }
+
+    public function testGetAvailableProviders(): void
+    {
+        $expected = ['google', 'github'];
+        $this->assertSame($expected, $this->service->getAvailableProviders());
     }
 }
