@@ -59,7 +59,7 @@ abstract class AbstractOAuthAuthenticator extends OAuth2Authenticator
             $request->getSession()->set(SecurityRequestAttributes::ACCESS_DENIED_ERROR, $exception);
         }
 
-        return new RedirectResponse($this->router->generate('auth.oauth.check'));
+        return new RedirectResponse($this->router->generate('auth.oauth.check', ['service' => $this->serviceName]));
     }
 
     public function authenticate(Request $request): Passport
