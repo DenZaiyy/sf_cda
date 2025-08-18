@@ -12,7 +12,7 @@ Le projet utilise GitHub Actions pour automatiser l'audit de sécurité, l'analy
     - Exécute l'audit de sécurité, l'analyse qualité et les tests.
     - Crée automatiquement une Pull Request de `test` vers `main` pour préparer le déploiement en production.
 
-- **main** : Chaque push déclenche le pipeline `CI Master Pipeline` qui :
+- **main** : Chaque push déclenche le pipeline `CI Main Pipeline` qui :
     - Exécute l'audit de sécurité, l'analyse qualité et les tests.
     - Déploie automatiquement en production via SSH si tout est valide.
 
@@ -28,7 +28,7 @@ Le projet utilise GitHub Actions pour automatiser l'audit de sécurité, l'analy
 
 ### 🚀 Déploiement
 
-- **Production** : Déploiement automatisé sur le serveur de production après validation sur `master`.
+- **Production** : Déploiement automatisé sur le serveur de production après validation sur `main`.
 - **Test** : (Commenté, mais prêt à l'emploi) Déploiement possible sur un environnement de test.
 
 ### 🔑 Sécurité
