@@ -10,9 +10,9 @@ Le projet utilise GitHub Actions pour automatiser l'audit de sécurité, l'analy
 
 - **test** : Chaque push déclenche le pipeline `CI Test Pipeline` qui :
     - Exécute l'audit de sécurité, l'analyse qualité et les tests.
-    - Crée automatiquement une Pull Request de `test` vers `master` pour préparer le déploiement en production.
+    - Crée automatiquement une Pull Request de `test` vers `main` pour préparer le déploiement en production.
 
-- **master** : Chaque push déclenche le pipeline `CI Master Pipeline` qui :
+- **main** : Chaque push déclenche le pipeline `CI Master Pipeline` qui :
     - Exécute l'audit de sécurité, l'analyse qualité et les tests.
     - Déploie automatiquement en production via SSH si tout est valide.
 
@@ -23,8 +23,8 @@ Le projet utilise GitHub Actions pour automatiser l'audit de sécurité, l'analy
 
 ### 🧪 Tests & Qualité
 
-- Les tests sont lancés avec `make tests` sur une base MySQL dédiée.
-- L'analyse qualité s'effectue via la commande `composer app:code-quality`.
+- Les tests sont lancés avec `make run-tests` sur une base MySQL dédiée.
+- L'analyse qualité s'effectue via la commande `make quality-check`.
 
 ### 🚀 Déploiement
 
