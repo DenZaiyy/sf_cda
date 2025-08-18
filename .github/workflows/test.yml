@@ -1,0 +1,57 @@
+name: Tests
+on:
+    workflow_call:
+jobs:
+    tests:
+        name: Tests
+        runs-on: ubuntu-latest
+        services:
+            database:
+                image: mysql:8.0
+                env:
+                    MYSQL_ROOT_PASSWORD: root
+                    MYSQL_DATABASE: sf_cda_test
+                    MYSQL_ALLOW_EMPTY_PASSWORD: no
+                ports:
+                    - 3306/tcp
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 8.3
+                  tools: composer:v2
+
+            - name: Setup Cache
+              run: echo "COMPOSER_CACHE_DIR=$(composer config cache-dir)" >> $GITHUB_ENV
+
+            - name: Caching deps
+              uses: actions/cache@v4
+              with:
+                  path: ${{ env.COMPOSER_CACHE_DIR }}
+                  key: php8.3-composer-${{ hashFiles('**/composer.json') }}
+                  restore-keys: |
+                      php8.3-composer-latest-
+
+            - name: Update composer
+              run: composer self-update
+
+            - name: Install deps
+              run: composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
+            - name: Wait for MySQL
+              run: |
+                  while ! mysqladmin ping -h127.0.0.1 -P${{ job.services.database.ports['3306'] }} -uroot -proot --silent; do
+                    echo "Waiting for MySQL..."
+                    sleep 1
+                  done
+
+            - name: Tests
+              run: make tests
+              env:
+                  APP_ENV: test
+                  APP_SECRET: 53cr3t4T3st3NV
+                  DATABASE_URL: mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306'] }}/sf_cda_test
