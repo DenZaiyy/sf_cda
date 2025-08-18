@@ -40,6 +40,7 @@ class RegistrationController extends AbstractController
             $password = $form->get('plainPassword')->getData();
 
             if (is_string($password)) {
+                $this->addFlash('success', 'Your account has been created.');
                 $this->userRegistrationService->register($user, $password);
                 return $this->redirectToRoute('app.home');
             }

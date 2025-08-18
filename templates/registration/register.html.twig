@@ -22,9 +22,10 @@
                     <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
                 {% endfor %}
 
-                {{ form_errors(registrationForm) }}
-
                 {{ form_start(registrationForm, {attr: {class: 'space-y-6'}}) }}
+                <div class="form-errors">
+                    {{ form_errors(registrationForm) }}
+                </div>
                 {{ form_row(registrationForm.email) }}
                 <div class="flex gap-4 w-full">
                     {{ form_row(registrationForm.plainPassword.first) }}
