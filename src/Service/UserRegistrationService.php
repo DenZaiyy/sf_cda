@@ -9,12 +9,12 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-final class UserRegistrationService
+readonly class UserRegistrationService
 {
     public function __construct(
-        private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly EntityManagerInterface      $em,
-        private readonly EmailVerifier               $emailVerifier,
+        private UserPasswordHasherInterface $passwordHasher,
+        private EntityManagerInterface      $em,
+        private EmailVerifier               $emailVerifier,
     ) {
     }
 
