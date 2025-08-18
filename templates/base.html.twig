@@ -19,6 +19,7 @@
                         <div class="flex space-x-4">
                             <a href="{{ path('app.home') }}" class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">Home</a>
                             {% if app.user %}
+                                <a href="{{ path('app.profile.index') }}" class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">Profile</a>
                                 <a href="{{ path('auth.oauth.logout') }}" class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">Logout</a>
                             {% else %}
                                 <a href="{{ path('app.register') }}" class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">Register</a>
