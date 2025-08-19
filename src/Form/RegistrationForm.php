@@ -55,20 +55,17 @@ class RegistrationForm extends AbstractType
                 'mapped' => false,
                 'invalid_message' => 'The password fields must match.',
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter a password',
-                    ]),
-                    new Length([
-                        'min' => 6,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
-                        // max length allowed by Symfony for security reasons
-                        'max' => 4096,
-                    ]),
-                    new Regex([
-                        'pattern' => '/^(?=.*\d)(?=.*[!-\/:-@[-`{-~À-ÿ§µ²°£])(?=.*[a-z])(?=.*[A-Z])(?=.*[A-Za-z]).{12,32}$/',
-                        'match' => true,
-                        'message' => "Le mot de passe doit contenir au moins 1 majuscule, 1 minuscule, 1 nombre, 1 caractère spéciale et doit faire au moins 12 caractères.",
-                    ])
+                    new NotBlank(message: 'Please enter a password'),
+                    new Length(
+                        min: 6,
+                        max: 4096,
+                        minMessage: 'Your password should be at least {{ limit }} characters'
+                    ),
+                    new Regex(
+                        pattern: '/^(?=.*\d)(?=.*[!-\/:-@[-`{-~À-ÿ§µ²°£])(?=.*[a-z])(?=.*[A-Z])(?=.*[A-Za-z]).{12,32}$/',
+                        message: "Le mot de passe doit contenir au moins 1 majuscule, 1 minuscule, 1 nombre, 1 caractère spéciale et doit faire au moins 12 caractères.",
+                        match: true,
+                    )
                 ],
             ])
             ->add('website', TextType::class, [
@@ -87,9 +84,7 @@ class RegistrationForm extends AbstractType
                     'class' => 'h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded'
                 ],
                 'constraints' => [
-                    new IsTrue([
-                        'message' => 'You should agree to our terms.',
-                    ]),
+                    new IsTrue(message: 'You should agree to our terms.'),
                 ],
             ])
             ->addEventSubscriber(new HoneypotSubscriber())
