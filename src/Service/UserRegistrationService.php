@@ -29,7 +29,7 @@ readonly class UserRegistrationService
             $user,
             (new TemplatedEmail())
                 ->from(new Address('info@denzaiyy.fr', 'DenZaiyy'))
-                ->to((string) $user->getEmail())
+                ->to($user->getEmail())
                 ->subject('Please Confirm your Email')
                 ->htmlTemplate('registration/confirmation_email.html.twig')
         );
