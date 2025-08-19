@@ -4,6 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -22,11 +23,15 @@ class ResetPasswordControllerTest extends WebTestCase
         // Ensure we have a clean database
         $container = static::getContainer();
 
+        /** @var Registry $doctrine */
+        $doctrine = $container->get('doctrine');
         /** @var EntityManagerInterface $em */
-        $em = $container->get('doctrine')->getManager();
+        $em = $doctrine->getManager();
         $this->em = $em;
 
-        $this->userRepository = $container->get(UserRepository::class);
+        /** @var UserRepository $userRepository */
+        $userRepository = $container->get(UserRepository::class);
+        $this->userRepository = $userRepository;
 
         foreach ($this->userRepository->findAll() as $user) {
             $this->em->remove($user);
@@ -61,7 +66,8 @@ class ResetPasswordControllerTest extends WebTestCase
         // self::assertQueuedEmailCount(1);
         self::assertEmailCount(1);
 
-        self::assertCount(1, $messages = self::getMailerMessages());
+        $messages = self::getMailerMessages();
+        self::assertCount(1, $messages);
 
         self::assertEmailAddressContains($messages[0], 'from', 'info@denzaiyy.fr');
         self::assertEmailAddressContains($messages[0], 'to', 'me@example.com');
