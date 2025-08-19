@@ -2,8 +2,10 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -20,9 +22,14 @@ class RegistrationControllerTest extends WebTestCase
         // Ensure we have a clean database
         $container = static::getContainer();
 
-        /** @var EntityManager $em */
-        $em = $container->get('doctrine')->getManager();
-        $this->userRepository = $container->get(UserRepository::class);
+        /** @var Registry $doctrine */
+        $doctrine = $container->get('doctrine');
+        /** @var EntityManagerInterface $em */
+        $em = $doctrine->getManager();
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $container->get(UserRepository::class);
+        $this->userRepository = $userRepository;
 
         foreach ($this->userRepository->findAll() as $user) {
             $em->remove($user);
@@ -47,15 +54,20 @@ class RegistrationControllerTest extends WebTestCase
 
         // Ensure the response redirects after submitting the form, the user exists, and is not verified
         // self::assertResponseRedirects('/');  @TODO: set the appropriate path that the user is redirected to.
-        self::assertCount(1, $this->userRepository->findAll());
-        self::assertFalse(($user = $this->userRepository->findAll()[0])->isVerified());
+        $allUsers = $this->userRepository->findAll();
+        self::assertCount(1, $allUsers);
+
+        $user = $allUsers[0];
+        self::assertInstanceOf(User::class, $user);
+        self::assertFalse($user->isVerified());
 
         // Ensure the verification email was sent
         // Use either assertQueuedEmailCount() || assertEmailCount() depending on your mailer setup
         // self::assertQueuedEmailCount(1);
         self::assertEmailCount(1);
 
-        self::assertCount(1, $messages = self::getMailerMessages());
+        $messages = self::getMailerMessages();
+        self::assertCount(1, $messages);
         self::assertEmailAddressContains($messages[0], 'from', 'info@denzaiyy.fr');
         self::assertEmailAddressContains($messages[0], 'to', 'me@example.com');
         self::assertEmailTextBodyContains($messages[0], 'This link will expire in 1 hour.');
@@ -76,6 +88,13 @@ class RegistrationControllerTest extends WebTestCase
         $this->client->request('GET', $resetLink[1]);
         $this->client->followRedirect();
 
-        self::assertTrue(static::getContainer()->get(UserRepository::class)->findAll()[0]->isVerified());
+        /** @var UserRepository $freshUserRepository */
+        $freshUserRepository = static::getContainer()->get(UserRepository::class);
+        $verifiedUsers = $freshUserRepository->findAll();
+        self::assertCount(1, $verifiedUsers);
+
+        $verifiedUser = $verifiedUsers[0];
+        self::assertInstanceOf(User::class, $verifiedUser);
+        self::assertTrue($verifiedUser->isVerified());
     }
 }

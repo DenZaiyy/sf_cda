@@ -7,7 +7,7 @@ quality-check:
 	php bin/console lint:twig templates
 	php bin/console lint:container
 	@echo "Running PHPStan with max level..."
-	vendor/bin/phpstan analyse src --level=max --memory-limit=-1
+	vendor/bin/phpstan analyse --level=max --memory-limit=-1
 	@echo "Running RECTOR with fix..."
 	vendor/bin/rector
 
