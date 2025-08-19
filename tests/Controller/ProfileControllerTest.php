@@ -2,16 +2,18 @@
 
 namespace App\Tests\Controller;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ProfileControllerTest extends WebTestCase
 {
-    private $client = null;
+    private KernelBrowser $client;
+
     protected function setUp(): void
     {
         $this->client = static::createClient([], [
             'PHP_AUTH_USER' => 'test@example.com',
-            'PHP_AUTH_PW'   => 'password',
+            'PHP_AUTH_PW' => 'password',
         ]);
     }
 
