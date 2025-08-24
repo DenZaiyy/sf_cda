@@ -50,7 +50,7 @@ jobs:
                   done
 
             - name: Tests
-              run: make tests
+              run: make run-tests
               env:
                   APP_ENV: test
                   APP_SECRET: 53cr3t4T3st3NV
