@@ -18,12 +18,26 @@ readonly class UserRegistrationService
     ) {
     }
 
-    public function register(User $user, string $plainPassword): void
+    public function register(User $user, string $plainPassword): bool
     {
+        $regex = "/^(?=.*\d)(?=.*[!-\/:-@[-`{-~À-ÿ§µ²°£])(?=.*[a-z])(?=.*[A-Z])(?=.*[A-Za-z]).{12,32}$/u";
+        $match = preg_match($regex, $plainPassword);
+
+        if (!$match || strlen($plainPassword) < 6) {
+            return false;
+        }
+
         $user->setPassword($this->passwordHasher->hashPassword($user, $plainPassword));
         $this->em->persist($user);
         $this->em->flush();
 
+        $this->sendConfirmationEmail($user);
+
+        return true;
+    }
+
+    private function sendConfirmationEmail(User $user): void
+    {
         $this->emailVerifier->sendEmailConfirmation(
             'app.verify.email',
             $user,
