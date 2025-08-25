@@ -2,7 +2,7 @@ import {Controller} from "@hotwired/stimulus"
 
 export default class extends Controller {
     connect() {
-        //console.log('alert_controller connected!')
+        console.log('alert_controller connected!')
         this.setupAutoRemove();
     }
 
@@ -13,8 +13,8 @@ export default class extends Controller {
     setupAutoRemove() {
         setTimeout(() => {
             this.element.style.opacity = '0';
-            this.element.addEventListener('transitionend', (e) => {
-                e.remove();
+            this.element.addEventListener('transitionend', () => {
+                this.element.remove();
             })
         }, 3000);
     }
