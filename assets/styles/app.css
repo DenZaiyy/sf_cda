@@ -1,1 +1,21 @@
 @import "tailwindcss";
+
+.flash-message {
+    @apply transition-opacity duration-500 ease-in-out z-50;
+}
+
+.flash-success {
+    @apply bg-green-600 text-white px-4 py-2 rounded-lg;
+}
+
+.flash-danger {
+    @apply bg-red-600 text-white px-4 py-2 rounded-lg;
+}
+
+.flash-notice {
+    @apply bg-yellow-600 text-white px-4 py-2 rounded-lg;
+}
+
+.flash-warning {
+    @apply bg-orange-600 text-white px-4 py-2 rounded-lg;
+}
