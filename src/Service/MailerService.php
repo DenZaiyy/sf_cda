@@ -19,81 +19,84 @@ readonly class MailerService
 
     public function sendWelcomeMail(string $userEmail): bool
     {
-        try {
-            $this->sendTemplatedEmail(
-                $userEmail,
-                "Bienvenue",
-                'emails/welcome.html.twig',
-                [
-                    'userEmail' => $userEmail,
-                    'loginUrl' => 'https://denz.ovh/login'
-                ]
-            );
-
-            $this->logger->info('Email de bienvenue envoyé', [
-                'recipient' => $userEmail
-            ]);
-
-            return true;
-        } catch (TransportExceptionInterface $e) {
-            $this->logger->error('Erreur lors de l\'envoi de l\'email de bienvenue', [
-                'error' => $e->getMessage(),
-                'recipient' => $userEmail
+        $validatedEmail = $this->validateEmail($userEmail);
+        if (!$validatedEmail) {
+            $this->logger->error("L'adresse e-mail n'est pas une adresse valide", [
+                'email' => $userEmail,
             ]);
 
             return false;
         }
+
+        $this->sendTemplatedEmail(
+            $userEmail,
+            "Bienvenue",
+            'emails/welcome.html.twig',
+            [
+                'userEmail' => $userEmail,
+                'loginUrl' => 'https://denz.ovh/login'
+            ]
+        );
+
+        $this->logger->info('Email de bienvenue envoyé', [
+            'recipient' => $userEmail
+        ]);
+
+        return true;
     }
 
-    public function sendAdminNotification(string $subject, string $message, array $context = []): bool
+    public function sendAdminNotification(string $subject, string $message, array $context = [], ?string $adminMail = null): bool
     {
-        try {
-            $this->sendTemplatedEmail(
-                $this->adminEmail,
-                '[ADMIN] ' . $subject,
-                'emails/admin/notification.html.twig',
-                [
-                    'message' => $message,
-                    'context' => $context,
-                    'timestamp' => new \DateTime()
-                ]
-            );
-
-            $this->logger->info('Notification admin envoyé', [
-                'subject' => $subject,
-                'context' => $context
-            ]);
-
-            return true;
-        } catch (TransportExceptionInterface $e) {
-            $this->logger->error('Erreur lors de l\'envoi de l\'email de notification administrateur', [
-                'error' => $e->getMessage(),
-                'recipient' => $this->adminEmail,
-                'subject' => $subject
+        $validatedEmail = $this->validateEmail($adminMail ?? $this->adminEmail);
+        if (!$validatedEmail) {
+            $this->logger->error("L'adresse e-mail n'est pas une adresse valide", [
+                'email' => $adminMail ?? $this->adminEmail,
             ]);
 
             return false;
         }
+
+        $this->sendTemplatedEmail(
+            $this->adminEmail,
+            '[ADMIN] ' . $subject,
+            'emails/admin/notification.html.twig',
+            [
+                'message' => $message,
+                'context' => $context,
+                'timestamp' => new \DateTime()
+            ]
+        );
+
+        $this->logger->info('Notification admin envoyé', [
+            'subject' => $subject,
+            'context' => $context
+        ]);
+
+        return true;
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     */
     private function sendTemplatedEmail(string $to, string $subject, string $template, array $context = [], ?string $from = null): void
     {
-        $email = (new TemplatedEmail())
-            ->from($from ?? $this->fromEmail)
-            ->to($to)
-            ->subject($subject)
-            ->htmlTemplate($template)
-            ->context($context);
+        try {
+            $email = (new TemplatedEmail())
+                ->from($from ?? $this->fromEmail)
+                ->to($to)
+                ->subject($subject)
+                ->htmlTemplate($template)
+                ->context($context);
+            $this->mailer->send($email);
+        } catch (TransportExceptionInterface $e) {
+            $this->logger->error('Erreur lors de l\'envoi de l\'email template', [
+                'error' => $e->getMessage(),
+                'recipient' => $to,
+                'subject' => $subject
+            ]);
+        }
+    }
 
-        $this->mailer->send($email);
-
-        $this->logger->info('Email templated envoyé', [
-            'recipient' => $to,
-            'template' => $template,
-            'subject' => $subject
-        ]);
+    private function validateEmail(string $email): bool
+    {
+        $pattern = "/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/i";
+        return preg_match($pattern, $email);
     }
 }
