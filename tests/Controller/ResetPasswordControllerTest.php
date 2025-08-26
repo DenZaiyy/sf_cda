@@ -15,6 +15,7 @@ class ResetPasswordControllerTest extends WebTestCase
     private KernelBrowser $client;
     private EntityManagerInterface $em;
     private UserRepository $userRepository;
+    private UserPasswordHasherInterface $passwordHasher;
 
     protected function setUp(): void
     {
@@ -33,6 +34,10 @@ class ResetPasswordControllerTest extends WebTestCase
         $userRepository = $container->get(UserRepository::class);
         $this->userRepository = $userRepository;
 
+        /** @var UserPasswordHasherInterface $passwordHasher */
+        $passwordHasher = $container->get(UserPasswordHasherInterface::class);
+        $this->passwordHasher = $passwordHasher;
+
         foreach ($this->userRepository->findAll() as $user) {
             $this->em->remove($user);
         }
@@ -44,9 +49,10 @@ class ResetPasswordControllerTest extends WebTestCase
     {
         // Create a test user
         $user = (new User())
-            ->setEmail('me@example.com')
-            ->setPassword('a-test-password-that-will-be-changed-later')
-        ;
+            ->setEmail('me@example.com');
+
+        $password = $this->passwordHasher->hashPassword($user, 'password');
+        $user->setPassword($password);
         $this->em->persist($user);
         $this->em->flush();
 
@@ -67,7 +73,7 @@ class ResetPasswordControllerTest extends WebTestCase
         self::assertEmailCount(1);
 
         $messages = self::getMailerMessages();
-        self::assertCount(1, $messages);
+        self::assertCount(2, $messages);
 
         self::assertEmailAddressContains($messages[0], 'from', 'info@denzaiyy.fr');
         self::assertEmailAddressContains($messages[0], 'to', 'me@example.com');
