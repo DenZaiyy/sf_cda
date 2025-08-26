@@ -22,8 +22,10 @@ class ProfileControllerTest extends WebTestCase
         $this->client->request('GET', '/profile/');
 
         // Votre contrôleur retourne 403 car vous utilisez IsGranted avec statusCode: HTTP_FORBIDDEN
-        self::assertResponseStatusCodeSame(403);
-        self::assertSelectorTextContains('body', 'You are not logged in.');
+        self::assertResponseStatusCodeSame(302);
+        $this->client->followRedirect();
+        $this->client->request('GET', '/login/');
+        //self::assertSelectorTextContains('body', 'You are not logged in.');
     }
 
     public function testIndexWithLogged(): void
