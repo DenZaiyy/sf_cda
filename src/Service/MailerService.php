@@ -45,6 +45,9 @@ readonly class MailerService
         return true;
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function sendAdminNotification(string $subject, string $message, array $context = [], ?string $adminMail = null): bool
     {
         $validatedEmail = $this->validateEmail($adminMail ?? $this->adminEmail);
@@ -75,6 +78,9 @@ readonly class MailerService
         return true;
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     private function sendTemplatedEmail(string $to, string $subject, string $template, array $context = [], ?string $from = null): void
     {
         try {
@@ -97,6 +103,6 @@ readonly class MailerService
     private function validateEmail(string $email): bool
     {
         $pattern = "/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/i";
-        return preg_match($pattern, $email);
+        return (bool) preg_match($pattern, $email);
     }
 }
