@@ -7,7 +7,7 @@ RED := $(ESC)[0;31m
 NC := $(ESC)[0m
 
 # Fonction utilitaire pour extraire DATABASE_URL du .env
-DATABASE_URL := $(shell grep "^DATABASE_URL=" .env.local | cut -d '=' -f2)
+DATABASE_URL := $(shell grep "^DATABASE_URL=" .env | cut -d '=' -f2)
 
 # Extraction des composants (ici MySQL/MariaDB)
 DB_USER := $(shell echo $(DATABASE_URL) | sed -E 's/^mysql:\/\/([^:]+):.*@.*$$/\1/')
