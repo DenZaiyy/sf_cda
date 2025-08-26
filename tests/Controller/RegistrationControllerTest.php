@@ -8,12 +8,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class RegistrationControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
     private UserRepository $userRepository;
     private EntityManagerInterface $entityManager;
+    private UserPasswordHasherInterface $passwordHasher;
 
     protected function setUp(): void
     {
@@ -22,11 +24,18 @@ class RegistrationControllerTest extends WebTestCase
         // Récupérer les services nécessaires
         $container = static::getContainer();
 
+        /** @var UserPasswordHasherInterface $passwordHasher */
+        $passwordHasher = $container->get(UserPasswordHasherInterface::class);
+        $this->passwordHasher = $passwordHasher;
+
         /** @var EntityManagerInterface $entityManager */
-        $this->entityManager = $container->get(EntityManagerInterface::class);
+        $entityManager = $container->get(EntityManagerInterface::class);
+        $this->entityManager = $entityManager;
 
         /** @var UserRepository $userRepository */
-        $this->userRepository = $container->get(UserRepository::class);
+        $userRepository = $container->get(UserRepository::class);
+        $this->userRepository = $userRepository;
+
 
         // Nettoyer la base de données avant chaque test
         $this->cleanDatabase();
@@ -55,12 +64,17 @@ class RegistrationControllerTest extends WebTestCase
         // Créer et connecter un utilisateur
         $user = new User();
         $user->setEmail('existing@example.com');
-        $user->setRoles(['ROLE_USER']);
+        $password = $this->passwordHasher->hashPassword($user, 'password');
+        $user->setPassword($password);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
 
         $this->client->loginUser($user);
-        $this->client->request('GET', '/register');
+        $this->client->request('GET', '/register/');
 
         // Doit rediriger vers la page d'accueil
+        self::assertResponseStatusCodeSame(301);
+        $this->client->followRedirect();
         self::assertResponseRedirects('/');
     }
 
@@ -70,16 +84,15 @@ class RegistrationControllerTest extends WebTestCase
         $this->client->request('GET', '/register');
         self::assertResponseIsSuccessful();
 
+        self::assertPageTitleContains('Register');
+
         // Soumettre le formulaire d'inscription
         $this->client->submitForm('Register', [
             'registration_form[email]' => 'me@example.com',
-            'registration_form[plainPassword][first]' => 'password123',
-            'registration_form[plainPassword][second]' => 'password123',
+            'registration_form[plainPassword][first]' => 'Test.123987!',
+            'registration_form[plainPassword][second]' => 'Test.123987!',
             'registration_form[agreeTerms]' => true,
         ]);
-
-        // Vérifier la redirection après inscription
-        self::assertResponseRedirects('/');
 
         // Vérifier qu'un utilisateur a été créé
         $allUsers = $this->userRepository->findAll();
@@ -93,7 +106,7 @@ class RegistrationControllerTest extends WebTestCase
 
         // Vérifier le message de succès
         $this->client->followRedirect();
-        self::assertSelectorTextContains('.alert-success', 'Your account has been created');
+        self::assertSelectorTextContains('.flash-success', 'Your account has been created');
     }
 
     public function testRegistrationSendsVerificationEmail(): void
@@ -101,9 +114,9 @@ class RegistrationControllerTest extends WebTestCase
         // Soumettre le formulaire d'inscription
         $this->client->request('GET', '/register');
         $this->client->submitForm('Register', [
-            'registration_form[email]' => 'me@example.com',
-            'registration_form[plainPassword][first]' => 'password123',
-            'registration_form[plainPassword][second]' => 'password123',
+            'registration_form[email]' => 'verification-email@example.com',
+            'registration_form[plainPassword][first]' => 'Test.123987!',
+            'registration_form[plainPassword][second]' => 'Test.123987!',
             'registration_form[agreeTerms]' => true,
         ]);
 
@@ -111,36 +124,25 @@ class RegistrationControllerTest extends WebTestCase
         self::assertEmailCount(1);
 
         $messages = self::getMailerMessages();
-        self::assertCount(1, $messages);
+        self::assertCount(2, $messages);
 
         /** @var TemplatedEmail $email */
         $email = $messages[0];
         self::assertEmailAddressContains($email, 'from', 'info@denzaiyy.fr');
-        self::assertEmailAddressContains($email, 'to', 'me@example.com');
+        self::assertEmailAddressContains($email, 'to', 'verification-email@example.com');
         self::assertEmailTextBodyContains($email, 'This link will expire in 1 hour.');
     }
 
     public function testEmailVerificationProcess(): void
     {
-        // Créer un utilisateur non vérifié
-        $user = new User();
-        $user->setEmail('test@example.com');
-        $user->setPassword('hashed_password');
-        $user->setRoles(['ROLE_USER']);
-        $user->setIsVerified(false);
-
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
-
-        // Connecter l'utilisateur
-        $this->client->loginUser($user);
-
         // Simuler l'inscription pour générer l'email de vérification
         $this->client->request('GET', '/register');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h2', 'Register a new account');
         $this->client->submitForm('Register', [
             'registration_form[email]' => 'verification@example.com',
-            'registration_form[plainPassword][first]' => 'password123',
-            'registration_form[plainPassword][second]' => 'password123',
+            'registration_form[plainPassword][first]' => 'Test.123987!',
+            'registration_form[plainPassword][second]' => 'Test.123987!',
             'registration_form[agreeTerms]' => true,
         ]);
 
@@ -168,12 +170,14 @@ class RegistrationControllerTest extends WebTestCase
         $newUser = $this->userRepository->findOneBy(['email' => 'verification@example.com']);
         self::assertNotNull($newUser);
 
-        // Connecter le nouvel utilisateur
-        $this->client->loginUser($newUser);
-
         // "Cliquer" sur le lien de vérification
         $this->client->request('GET', $verificationLink);
-        self::assertResponseRedirects('/');
+        $this->client->followRedirect();
+
+        $this->client->submitForm("Sign in", [
+            '_username' => 'verification@example.com',
+            '_password' => 'Test.123987!',
+        ]);
 
         // Suivre la redirection
         $this->client->followRedirect();
@@ -182,8 +186,17 @@ class RegistrationControllerTest extends WebTestCase
         $this->entityManager->refresh($newUser);
         self::assertTrue($newUser->isVerified(), 'User should be verified after clicking verification link');
 
-        // Vérifier le message de succès
-        self::assertSelectorTextContains('.alert-success', 'Your email address has been verified');
+        // Vérifier qu'un email a été envoyé
+        self::assertEmailCount(1);
+
+        $messages = self::getMailerMessages();
+        self::assertCount(2, $messages);
+
+        /** @var TemplatedEmail $email */
+        $email = $messages[1];
+        self::assertEmailAddressContains($email, 'from', 'noreply@denz.ovh');
+        self::assertEmailAddressContains($email, 'to', 'verification@example.com');
+        self::assertEmailTextBodyContains($email, 'Nous sommes ravis de vous accueillir sur notre plateforme. Votre compte a été créé avec succès.');
     }
 
     public function testRegistrationWithInvalidData(): void
@@ -198,7 +211,7 @@ class RegistrationControllerTest extends WebTestCase
             'registration_form[agreeTerms]' => false,
         ]);
 
-        // Ne doit pas rediriger (reste sur la page avec erreurs)
+        // Ne dois pas rediriger (reste sur la page avec erreurs).
         self::assertResponseIsSuccessful();
 
         // Aucun utilisateur ne doit être créé

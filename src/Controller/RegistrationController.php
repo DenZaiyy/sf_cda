@@ -44,8 +44,8 @@ class RegistrationController extends AbstractController
             $password = $form->get('plainPassword')->getData();
 
             if (is_string($password)) {
-                $this->addFlash('success', 'Your account has been created.');
                 $this->userRegistrationService->register($user, $password);
+                $this->addFlash('success', 'Your account has been created.');
                 return $this->redirectToRoute('app.home');
             }
         }
@@ -69,16 +69,11 @@ class RegistrationController extends AbstractController
 
             // Vérification de l'email - cela met à jour isVerified=true et persiste
             $this->emailVerifier->handleEmailConfirmation($request, $user);
-            dd('test');
-
-            // Important : Rafraîchir l'entité depuis la base de données
             $this->entityManager->refresh($user);
-
-            // Maintenant envoyer l'email de bienvenue
             $welcomeSent = $this->mailerService->sendWelcomeMail($user->getEmail());
 
             if ($welcomeSent) {
-                $this->addFlash('success', 'Votre adresse email a été vérifiée. Un email de bienvenue vous a été envoyé.');
+                $this->addFlash('success', "Votre adresse email a été vérifiée. Un email de bienvenue vous a été envoyé.");
             } else {
                 $this->addFlash('success', 'Votre adresse email a été vérifiée.');
                 $this->addFlash('warning', 'L\'email de bienvenue n\'a pas pu être envoyé.');
