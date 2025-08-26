@@ -6,14 +6,13 @@ INFO := $(ESC)[0;34m
 RED := $(ESC)[0;31m
 NC := $(ESC)[0m
 
-# Fonction utilitaire pour extraire DATABASE_URL du .env
-DATABASE_URL := $(shell grep "^DATABASE_URL=" .env | cut -d '=' -f2)
+# Récupère DATABASE_URL et enlève les guillemets
+DATABASE_URL := $(shell grep "^DATABASE_URL=" .env | cut -d '=' -f2 | tr -d '"')
 
-# Extraction des composants (ici MySQL/MariaDB)
+# Extraction MySQL/MariaDB
 DB_USER := $(shell echo $(DATABASE_URL) | sed -E 's/^mysql:\/\/([^:]+):.*@.*$$/\1/')
 DB_PASSWORD := $(shell echo $(DATABASE_URL) | sed -E 's/^mysql:\/\/[^:]+:([^@]+)@.*$$/\1/')
 DB_NAME := $(shell echo $(DATABASE_URL) | sed -E 's/^mysql:\/\/[^:]+:[^@]+@[^/]+\/([^?]+).*$$/\1/')
-
 
 define banner
 	@echo "$(BOLD)$(1)--------------------------------------------"
@@ -27,30 +26,32 @@ help:
 	@echo "make run-tests        - Running phpunit tests"
 
 quality-check:
-	@echo "Running quality checks..."
-	@echo "Running ECS fix..."
+	$(call banner,$(YELLOW),Running quality checks ...)
+	$(call banner,$(INFO),Running ECS fix...)
 	vendor/bin/ecs check --fix
-	@echo "Running RECTOR with fix..."
+	$(call banner,$(INFO),Running RECTOR with fix...)
 	vendor/bin/rector
-	@echo "Running linter yaml, twig and container..."
+	$(call banner,$(INFO),Running linter yaml, twig and container...)
 	php bin/console lint:yaml config --parse-tags
 	php bin/console lint:twig templates
 	php bin/console lint:container
-	@echo "Running PHPStan with max level..."
+	$(call banner,$(INFO),Running PHPStan on level max...)
 	vendor/bin/phpstan analyse --level=max --memory-limit=-1
 
 run-tests:
-	@echo "Drop database if already exists..."
+	$(call banner,$(INFO),Drop database if already exists...)
 	php bin/console --env=test doctrine:database:drop --force --if-exists
-	@echo "Creating database..."
+	$(call banner,$(INFO),Creating database...)
 	php bin/console --env=test doctrine:database:create
-	@echo "Running migrations..."
+	$(call banner,$(INFO),Running migrations...)
 	php bin/console --env=test doctrine:migrations:migrate --no-interaction --allow-no-migration
-	@echo "Loading fixtures..."
+	$(call banner,$(INFO),Loading fixtures...)
 	php bin/console --env=test doctrine:fixtures:load --no-interaction
-	@echo "Clearing cache..."
+	$(call banner,$(INFO),Clearing cache...)
 	php bin/console --env=test cache:clear
-	@echo "Running tests..."
+	$(call banner,$(INFO),Warmup cache...)
+	php bin/console --env=test cache:warmup
+	$(call banner,$(INFO),Running tests...)
 	php bin/phpunit
 
 # Déploiement standard
