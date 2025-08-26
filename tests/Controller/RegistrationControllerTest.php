@@ -194,7 +194,7 @@ class RegistrationControllerTest extends WebTestCase
 
         /** @var TemplatedEmail $email */
         $email = $messages[1];
-        self::assertEmailAddressContains($email, 'from', 'noreply@denz.ovh');
+        self::assertEmailAddressContains($email, 'from', 'noreply@example.com');
         self::assertEmailAddressContains($email, 'to', 'verification@example.com');
         self::assertEmailTextBodyContains($email, 'Nous sommes ravis de vous accueillir sur notre plateforme. Votre compte a été créé avec succès.');
     }
