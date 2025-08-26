@@ -6,6 +6,15 @@ INFO := $(ESC)[0;34m
 RED := $(ESC)[0;31m
 NC := $(ESC)[0m
 
+# Fonction utilitaire pour extraire DATABASE_URL du .env
+DATABASE_URL := $(shell grep "^DATABASE_URL=" .env.local | cut -d '=' -f2)
+
+# Extraction des composants (ici MySQL/MariaDB)
+DB_USER := $(shell echo $(DATABASE_URL) | sed -E 's/^mysql:\/\/([^:]+):.*@.*$$/\1/')
+DB_PASSWORD := $(shell echo $(DATABASE_URL) | sed -E 's/^mysql:\/\/[^:]+:([^@]+)@.*$$/\1/')
+DB_NAME := $(shell echo $(DATABASE_URL) | sed -E 's/^mysql:\/\/[^:]+:[^@]+@[^/]+\/([^?]+).*$$/\1/')
+
+
 define banner
 	@echo "$(BOLD)$(1)--------------------------------------------"
 	@echo "$(2)"
@@ -43,3 +52,22 @@ run-tests:
 	php bin/console --env=test cache:clear
 	@echo "Running tests..."
 	php bin/phpunit
+
+# Déploiement standard
+deploy:
+	APP_ENV=prod APP_DEBUG=0 COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+	APP_ENV=prod APP_DEBUG=0 php bin/console doctrine:database:create --if-not-exists --no-interaction
+	APP_ENV=prod APP_DEBUG=0 php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+	APP_ENV=prod APP_DEBUG=0 php bin/console cache:clear
+	APP_ENV=prod APP_DEBUG=0 php bin/console cache:warmup
+	APP_ENV=prod APP_DEBUG=0 php bin/console importmap:install
+	APP_ENV=prod APP_DEBUG=0 php bin/console tailwind:build --minify
+	APP_ENV=prod APP_DEBUG=0 php bin/console asset-map:compile
+
+# Déploiement avec backup DB
+deploy-safe:
+	@echo "=== Sauvegarde de la base de données avant migrations ==="
+	mkdir -p backups
+	mysqldump -u $(DB_USER) -p$(DB_PASSWORD) $(DB_NAME) > backups/db_$$(date +%F_%H-%M-%S).sql
+	@echo "=== Sauvegarde terminée ==="
+	$(MAKE) deploy
