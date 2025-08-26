@@ -22,8 +22,20 @@ endef
 
 help:
 	$(call banner,$(YELLOW),Available targets:)
+	@echo "make tw               - Build tailwind css file minified"
+	@echo "make watch            - Watch mode for tailwind build"
 	@echo "make quality-check    - Check our code with ECS, rector, linter and phpstan"
 	@echo "make run-tests        - Running phpunit tests"
+	@echo "make deploy           - Deploy application for production environment"
+	@echo "make deploy-safe      - Backup database before deploy application to production"
+
+tw:
+	$(call banner,$(RED),Starting build for tailwind v4...)
+	php bin/console tailwind:build --minify
+
+watch:
+	$(call banner,$(YELLOW),Watching changes for tailwind build...)
+	php bin/console tailwind:build --watch
 
 quality-check:
 	$(call banner,$(YELLOW),Running quality checks ...)

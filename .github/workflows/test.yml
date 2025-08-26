@@ -58,7 +58,8 @@ jobs:
               env:
                   APP_ENV: test
                   APP_SECRET: 53cr3t4T3st3NV
-                  DATABASE_URL: mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306'] }}/sf_cda_test
+                  DATABASE_URL: "mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306'] }}/sf_cda_test"
                   ADMIN_EMAIL: admin@example.com
-                  FROM_EMAIL: noreply@example.com
+                  FROM_EMAIL: noreply@example.
+                  MAILER_DSN: smtp://mailer:${{ job.services.mailer.ports['1025'] }}
 
