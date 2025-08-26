@@ -21,8 +21,9 @@ class ChangePasswordForm extends AbstractType
                 'type' => PasswordType::class,
                 'options' => [
                     'attr' => [
-                        'autocomplete' => 'new-password',
+                        'autocomplete' => 'new-password'
                     ],
+                    'toggle' => true,
                 ],
                 'first_options' => [
                     'constraints' => [
@@ -36,9 +37,19 @@ class ChangePasswordForm extends AbstractType
                         new NotCompromisedPassword(),
                     ],
                     'label' => 'New password',
+                    'label_attr' => ['class' => 'block text-sm font-medium text-gray-700 dark:text-white'],
+                    'attr' => [
+                        'placeholder' => 'Enter your new password',
+                        'class' => 'appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
+                    ]
                 ],
                 'second_options' => [
                     'label' => 'Repeat Password',
+                    'label_attr' => ['class' => 'block text-sm font-medium text-gray-700 dark:text-white'],
+                    'attr' => [
+                        'placeholder' => 'Repeat your new password',
+                        'class' => 'appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
+                    ]
                 ],
                 'invalid_message' => 'The password fields must match.',
                 'mapped' => false,
