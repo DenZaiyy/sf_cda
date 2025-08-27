@@ -60,9 +60,9 @@ quality-check:
 
 run-tests:
 	$(call banner,$(INFO),Drop database if already exists...)
-	php bin/console --env=test doctrine:database:drop --force --if-exists
+	php bin/console --env=test doctrine:database:drop --force --if-exists --no-interaction
 	$(call banner,$(INFO),Creating database...)
-	php bin/console --env=test doctrine:database:create
+	php bin/console --env=test doctrine:database:create --no-interaction
 	$(call banner,$(INFO),Running migrations...)
 	php bin/console --env=test doctrine:migrations:migrate --no-interaction --allow-no-migration
 	$(call banner,$(INFO),Loading fixtures...)
