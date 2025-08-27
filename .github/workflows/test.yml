@@ -12,8 +12,6 @@ jobs:
                     MYSQL_ROOT_PASSWORD: root
                     MYSQL_DATABASE: sf_cda_test
                     MYSQL_ALLOW_EMPTY_PASSWORD: no
-                    MYSQL_CHARSET: utf8mb4
-                    MYSQL_COLLATION: utf8mb4_unicode_ci
                 ports:
                     - 3306/tcp
                 options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -53,7 +51,7 @@ jobs:
 
             - name: Update .env.test with dynamic database port
               run: |
-                  sed -i "s|DATABASE_URL=.*|DATABASE_URL=\"mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306'] }}/sf_cda_test?serverVersion=8.0&charset=utf8mb4&defaultTableOptions[charset]=utf8mb4&defaultTableOptions[collate]=utf8mb4_unicode_ci\"|" .env.test
+                  sed -i "s|DATABASE_URL=.*|DATABASE_URL=\"mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306'] }}/sf_cda_test?serverVersion=8.0&charset=utf8mb4\"|" .env.test
 
             - name: Tests
               run: make run-tests
