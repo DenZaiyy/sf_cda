@@ -14,7 +14,7 @@ jobs:
                     MYSQL_ALLOW_EMPTY_PASSWORD: no
                 ports:
                     - 3306/tcp
-                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -51,7 +51,7 @@ jobs:
 
             - name: Update .env.test with dynamic database port
               run: |
-                  sed -i "s|DATABASE_URL=.*|DATABASE_URL=\"mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306'] }}/sf_cda_test?serverVersion=8.0&charset=utf8mb4\"|" .env.test
+                  sed -i "s|DATABASE_URL=.*|DATABASE_URL=\"mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306'] }}/sf_cda_test?serverVersion=8.0&charset=utf8mb4&defaultTableOptions[charset]=utf8mb4&defaultTableOptions[collate]=utf8mb4_unicode_ci\"|" .env.test
 
             - name: Tests
               run: make run-tests
