@@ -22,12 +22,20 @@ endef
 
 help:
 	$(call banner,$(YELLOW),Available targets:)
+	@echo "make up               - Start docker container"
+	@echo "make down             - Stop docker container"
 	@echo "make tw               - Build tailwind css file minified"
 	@echo "make watch            - Watch mode for tailwind build"
 	@echo "make quality-check    - Check our code with ECS, rector, linter and phpstan"
 	@echo "make run-tests        - Running phpunit tests"
 	@echo "make deploy           - Deploy application for production environment"
 	@echo "make deploy-safe      - Backup database before deploy application to production"
+
+up:
+	docker-compose up -d
+
+down:
+	docker-compose down
 
 tw:
 	$(call banner,$(RED),Starting build for tailwind v4...)
