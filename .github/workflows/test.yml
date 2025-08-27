@@ -12,9 +12,11 @@ jobs:
                     MYSQL_ROOT_PASSWORD: root
                     MYSQL_DATABASE: sf_cda_test
                     MYSQL_ALLOW_EMPTY_PASSWORD: no
+                    MYSQL_CHARSET: utf8mb4
+                    MYSQL_COLLATION: utf8mb4_unicode_ci
                 ports:
                     - 3306/tcp
-                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
         steps:
             - name: Checkout
               uses: actions/checkout@v4
