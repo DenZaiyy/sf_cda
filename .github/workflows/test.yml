@@ -7,7 +7,7 @@ jobs:
         runs-on: ubuntu-latest
         services:
             database:
-                image: mysql:8.0.32
+                image: mysql:8.0
                 env:
                     MYSQL_ROOT_PASSWORD: root
                     MYSQL_DATABASE: sf_cda_test
@@ -15,10 +15,6 @@ jobs:
                 ports:
                     - 3306/tcp
                 options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-            mailer:
-                image: mailhog/mailhog:latest
-                ports:
-                    - "1025:1025" # SMTP
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -58,8 +54,8 @@ jobs:
               env:
                   APP_ENV: test
                   APP_SECRET: 53cr3t4T3st3NV
-                  DATABASE_URL: mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306'] }}/sf_cda_test?serverVersion=8.0.32&charset=utf8mb4
+                  DATABASE_URL: mysql://root:root@database:${{ job.services.database.ports['3306'] }}/sf_cda_test?serverVersion=8.0.32&charset=utf8mb4
                   ADMIN_EMAIL: admin@example.com
                   FROM_EMAIL: noreply@example.com
-                  MAILER_DSN: smtp://mailer:${{ job.services.mailer.ports['1025'] }}
+                  MAILER_DSN: native://default
 
