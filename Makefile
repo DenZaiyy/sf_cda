@@ -74,6 +74,22 @@ run-tests:
 	$(call banner,$(INFO),Running tests...)
 	php bin/phpunit
 
+run-tests-coverage:
+	$(call banner,$(INFO),Drop database if already exists...)
+	php bin/console --env=test doctrine:database:drop --force --if-exists --no-interaction
+	$(call banner,$(INFO),Creating database...)
+	php bin/console --env=test doctrine:database:create --no-interaction
+	$(call banner,$(INFO),Running migrations...)
+	php bin/console --env=test doctrine:migrations:migrate --no-interaction --allow-no-migration
+	$(call banner,$(INFO),Loading fixtures...)
+	php bin/console --env=test doctrine:fixtures:load --no-interaction
+	$(call banner,$(INFO),Clearing cache...)
+	php bin/console --env=test cache:clear
+	$(call banner,$(INFO),Warmup cache...)
+	php bin/console --env=test cache:warmup
+	$(call banner,$(INFO),Running tests with coverage...)
+	XDEBUG_MODE=coverage php bin/phpunit --coverage-html=coverage/html --coverage-clover=coverage/clover.xml --coverage-xml=coverage/xml --log-junit=coverage/junit.xml
+
 # Déploiement standard
 deploy:
 	APP_ENV=prod APP_DEBUG=0 COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
