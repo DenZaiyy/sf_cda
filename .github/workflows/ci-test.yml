@@ -12,7 +12,6 @@ jobs:
     # Re-teste tout sur test pour sécurité
     audit:
         uses: ./.github/workflows/audit.yml
-
     quality:
         uses: ./.github/workflows/quality.yml
     test:

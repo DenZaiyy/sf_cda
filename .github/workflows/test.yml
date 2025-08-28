@@ -28,6 +28,7 @@ jobs:
               with:
                   php-version: 8.3
                   tools: composer:v2
+                  coverage: xdebug
 
             - name: Setup Cache
               run: echo "COMPOSER_CACHE_DIR=$(composer config cache-dir)" >> $GITHUB_ENV
@@ -58,5 +59,26 @@ jobs:
                   sed -i "s|DATABASE_URL=.*|DATABASE_URL=\"mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306'] }}/sf_cda?charset=utf8mb4\"|" .env.test
                   sed -i "s|MAILER_DSN=.*|MAILER_DSN=\"smtp://127.0.0.1:${{ job.services.mailer.ports['1025'] }}\"|" .env.test
 
-            - name: Tests
-              run: make run-tests
+            - name: Create coverage directory
+              run: mkdir -p coverage
+
+            - name: Tests with Coverage
+              run: make run-tests-coverage
+
+            - name: Upload Coverage Reports
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: coverage-reports
+                  path: |
+                      coverage/
+                      phpunit-coverage.xml
+                  retention-days: 30
+
+            - name: Upload Coverage HTML Report
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: coverage-html
+                  path: coverage/html/
+                  retention-days: 30

@@ -2,7 +2,7 @@ name: CI Main Pipeline
 on:
     push:
         branches:
-            - test
+            - main
 jobs:
     audit:
         uses: ./.github/workflows/audit.yml
