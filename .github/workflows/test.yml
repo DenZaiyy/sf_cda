@@ -51,7 +51,7 @@ jobs:
 
             - name: Update .env.test with dynamic database port
               run: |
-                  sed -i "s|DATABASE_URL=.*|DATABASE_URL=\"mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306'] }}/sf_cda_test?serverVersion=8.0&charset=utf8mb4\"|" .env.test
+                  sed -i "s|DATABASE_URL=.*|DATABASE_URL=\"mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306'] }}/sf_cda?charset=utf8mb4\"|" .env.test
 
             - name: Tests
               run: make run-tests
