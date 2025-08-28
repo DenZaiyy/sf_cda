@@ -18,7 +18,7 @@ jobs:
             mailer:
                 image: mailhog/mailhog:latest
                 ports:
-                    - "1025:1025" # SMTP
+                    - 1025/tcp # SMTP
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -28,6 +28,7 @@ jobs:
               with:
                   php-version: 8.3
                   tools: composer:v2
+                  coverage: xdebug
 
             - name: Setup Cache
               run: echo "COMPOSER_CACHE_DIR=$(composer config cache-dir)" >> $GITHUB_ENV
@@ -53,12 +54,31 @@ jobs:
                     sleep 1
                   done
 
-            - name: Tests
-              run: make run-tests
-              env:
-                  APP_ENV: test
-                  APP_SECRET: 53cr3t4T3st3NV
-                  DATABASE_URL: mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306'] }}/sf_cda_test
-                  ADMIN_EMAIL: admin@example.com
-                  FROM_EMAIL: noreply@example.com
+            - name: Update .env.test with dynamic database port
+              run: |
+                  sed -i "s|DATABASE_URL=.*|DATABASE_URL=\"mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306'] }}/sf_cda?charset=utf8mb4\"|" .env.test
+                  sed -i "s|MAILER_DSN=.*|MAILER_DSN=\"smtp://127.0.0.1:${{ job.services.mailer.ports['1025'] }}\"|" .env.test
 
+            - name: Create coverage directory
+              run: mkdir -p coverage
+
+            - name: Tests with Coverage
+              run: make run-tests-coverage
+
+            - name: Upload Coverage Reports
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: coverage-reports
+                  path: |
+                      coverage/
+                      phpunit-coverage.xml
+                  retention-days: 30
+
+            - name: Upload Coverage HTML Report
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: coverage-html
+                  path: coverage/html/
+                  retention-days: 30

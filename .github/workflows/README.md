@@ -10,11 +10,11 @@ Le projet utilise GitHub Actions pour automatiser l'audit de sécurité, l'analy
 
 - **test** : Chaque push déclenche le pipeline `CI Test Pipeline` qui :
     - Exécute l'audit de sécurité, l'analyse qualité et les tests.
-    - Crée automatiquement une Pull Request de `test` vers `main` pour préparer le déploiement en production.
+    - Crée automatiquement une **PR (Pull Request)** de `test` vers `main` pour préparer le déploiement en production (a accepté manuellement).
 
 - **main** : Chaque push déclenche le pipeline `CI Main Pipeline` qui :
-    - Exécute l'audit de sécurité, l'analyse qualité et les tests.
-    - Déploie automatiquement en production via SSH si tout est valide.
+    - Exécute l'audit de sécurité.
+    - Déploie automatiquement en production via SSH si l'audit est validé.
 
 ### 🛡️ Audit de sécurité
 
@@ -23,13 +23,22 @@ Le projet utilise GitHub Actions pour automatiser l'audit de sécurité, l'analy
 
 ### 🧪 Tests & Qualité
 
-- Les tests sont lancés avec `make run-tests` sur une base MySQL dédiée.
-- L'analyse qualité s'effectue via la commande `make quality-check`.
+- Les tests sont lancés avec `make run-tests` sur une base MySQL dédiée avec les tâches suivantes.
+  - Suppression de la base de données existante
+  - Création de la base de données
+  - Exécuté les migrations
+  - Charger les fixtures
+  - Vide le cache
+  - Lance les tests avec PHPUnit
+- L'analyse qualité s'effectue via la commande `make quality-check` avec les actions suivantes :
+  - Vérification et fixe du code avec ECS (Easy Coding Standard)
+  - Vérification et fixe du code avec Rector
+  - Exécuter le linter pour les fichiers yaml, twig et conteneur.
+  - Vérifier les typages grâce à PHPStan (au niveau max)
 
 ### 🚀 Déploiement
 
 - **Production** : Déploiement automatisé sur le serveur de production après validation sur `main`.
-- **Test** : (Commenté, mais prêt à l'emploi) Déploiement possible sur un environnement de test.
 
 ### 🔑 Sécurité
 

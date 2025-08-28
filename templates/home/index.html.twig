@@ -6,7 +6,7 @@
 <div class="container mx-auto px-4 py-8">
     {% if app.user %}
         <h1>Bienvenue <strong>{{ app.user.email }}</strong></h1>
-        <p>Vous utiliser : <strong>{% if app.user.googleId is defined %}Google {% elseif app.user.githubId is defined %}Github{% else %}Authentification classique{% endif %}</strong></p>
+        <p>Vous utilisez : <strong>{% if app.user.googleId is not null %}Google {% elseif app.user.githubId is not null %}Github{% else %}Authentification classique{% endif %}</strong></p>
     {% endif %}
 </div>
 {% endblock %}

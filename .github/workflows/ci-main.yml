@@ -1,0 +1,25 @@
+name: CI Main Pipeline
+on:
+    push:
+        branches:
+            - main
+jobs:
+    audit:
+        uses: ./.github/workflows/audit.yml
+
+    deploy:
+        needs: audit
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Setup SSH
+              uses: webfactory/ssh-agent@v0.9.0
+              with:
+                  ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+            - name: Add known_hosts
+              run: |
+                  ssh-keyscan -H denz.ovh >> ~/.ssh/known_hosts
+
+            - name: Deploy to production
+              run: ${{ secrets.DEPLOY_SCRIPT }}
