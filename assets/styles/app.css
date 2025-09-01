@@ -19,3 +19,11 @@
 .flash-warning {
     @apply bg-orange-600 text-white;
 }
+
+h1 {
+    @apply text-3xl font-extrabold text-gray-900 dark:text-white;
+}
+
+h2 {
+    @apply text-xl font-extrabold text-gray-900 dark:text-white;
+}

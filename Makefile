@@ -7,7 +7,7 @@ RED := $(ESC)[0;31m
 NC := $(ESC)[0m
 
 # Récupère DATABASE_URL et enlève les guillemets
-DATABASE_URL := $(shell grep "^DATABASE_URL=" .env | cut -d '=' -f2 | tr -d '"')
+DATABASE_URL := $(shell grep "^DATABASE_URL=" .env.local | cut -d '=' -f2 | tr -d '"')
 
 # Extraction MySQL/MariaDB
 DB_USER := $(shell echo $(DATABASE_URL) | sed -E 's/^mysql:\/\/([^:]+):.*@.*$$/\1/')
@@ -22,14 +22,14 @@ endef
 
 help:
 	$(call banner,$(YELLOW),Available targets:)
-	@echo "make up               - Start docker container"
-	@echo "make down             - Stop docker container"
-	@echo "make tw               - Build tailwind css file minified"
-	@echo "make watch            - Watch mode for tailwind build"
-	@echo "make quality-check    - Check our code with ECS, rector, linter and phpstan"
-	@echo "make run-tests        - Running phpunit tests"
-	@echo "make deploy           - Deploy application for production environment"
-	@echo "make deploy-safe      - Backup database before deploy application to production"
+	@echo "make up                    - Start docker container"
+	@echo "make down                  - Stop docker container"
+	@echo "make tw                    - Build tailwind css file minified"
+	@echo "make watch                 - Watch mode for tailwind build"
+	@echo "make quality-check         - Check our code with ECS, rector, linter and PHPStan"
+	@echo "make run-tests             - Running phpunit tests"
+	@echo "make deploy                - Deploy application for production environment"
+	@echo "make deploy-safe           - Backup database before deploy application to production"
 
 up:
 	docker-compose up -d

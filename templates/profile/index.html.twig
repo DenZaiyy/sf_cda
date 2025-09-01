@@ -6,5 +6,12 @@
     <div class="container mx-auto px-4 py-8">
         <h1>Profile</h1>
         Welcome to your profile {{ app.user.email }}
+
+        <div class="mt-5">
+            <h2 class="mb-2">Change your password</h2>
+            <turbo-frame id="profile-change-password">
+                <a href="{{ path('app.profile.change.password') }}" class="hover:underline text-blue-700 hover:text-blue-400 transition-all duration-200">here</a>
+            </turbo-frame>
+        </div>
     </div>
 {% endblock %}
