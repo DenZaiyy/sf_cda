@@ -11,6 +11,7 @@
 
 /.idea/
 .DS_Store
+backups/
 
 ###> phpunit/phpunit ###
 /phpunit.xml
