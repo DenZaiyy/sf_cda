@@ -36,7 +36,6 @@ services:
             - sf-network
         volumes:
             - database_data:/var/lib/mysql:rw
-        platform: linux/arm64/v8
 
     mailer:
         image: mailhog/mailhog:latest
