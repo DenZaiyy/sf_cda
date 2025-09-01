@@ -17,4 +17,3 @@ RUN pecl install xdebug \
   && docker-php-ext-enable xdebug
 
 WORKDIR /app
-RUN php bin/console cache:clear --env=prod --no-dev
