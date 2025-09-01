@@ -138,7 +138,7 @@ class RegistrationControllerTest extends WebTestCase
         // Simuler l'inscription pour générer l'email de vérification
         $this->client->request('GET', '/register');
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h2', 'Register a new account');
+        self::assertSelectorTextContains('h1', 'Register a new account');
         $this->client->submitForm('Register', [
             'registration_form[email]' => 'verification@example.com',
             'registration_form[plainPassword][first]' => 'Test.123987!',
