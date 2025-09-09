@@ -20,32 +20,31 @@ define banner
 	@echo "--------------------------------------------$(NC)"
 endef
 
-help:
+.PHONY: help
+help: ## Show this help
 	$(call banner,$(YELLOW),Available targets:)
-	@echo "make up                    - Start docker container"
-	@echo "make down                  - Stop docker container"
-	@echo "make tw                    - Build tailwind css file minified"
-	@echo "make watch                 - Watch mode for tailwind build"
-	@echo "make quality-check         - Check our code with ECS, rector, linter and PHPStan"
-	@echo "make run-tests             - Running phpunit tests"
-	@echo "make deploy                - Deploy application for production environment"
-	@echo "make deploy-safe           - Backup database before deploy application to production"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-up:
+.PHONY: up
+up: ## Starting docker container
 	docker-compose up -d
 
-down:
+.PHONY: down
+down: ## Stopping docker
 	docker-compose down
 
-tw:
+.PHONY: tw
+tw: ## Building tailwind and minify
 	$(call banner,$(RED),Starting build for tailwind v4...)
 	php bin/console tailwind:build --minify
 
-watch:
+.PHONY: watch
+watch: ## Building tailwind with watch mode
 	$(call banner,$(YELLOW),Watching changes for tailwind build...)
 	php bin/console tailwind:build --watch
 
-quality-check:
+.PHONY: quality-check
+quality-check: ## Running check quality of entire code
 	$(call banner,$(YELLOW),Running quality checks ...)
 	$(call banner,$(INFO),Running ECS fix...)
 	vendor/bin/ecs check --fix
@@ -58,7 +57,8 @@ quality-check:
 	$(call banner,$(INFO),Running PHPStan on level max...)
 	vendor/bin/phpstan analyse --level=max --memory-limit=-1
 
-run-tests:
+.PHONY: run-tests
+run-tests: ## Running tests with coverage result
 	$(call banner,$(INFO),Drop database if already exists...)
 	php bin/console --env=test doctrine:database:drop --force --if-exists --no-interaction
 	$(call banner,$(INFO),Creating database...)
@@ -90,8 +90,8 @@ run-tests-coverage:
 	$(call banner,$(INFO),Running tests with coverage...)
 	XDEBUG_MODE=coverage php bin/phpunit --coverage-html=coverage/html --coverage-clover=coverage/clover.xml --coverage-xml=coverage/xml --log-junit=coverage/junit.xml
 
-# Déploiement standard
-deploy:
+.PHONY: deploy
+deploy: ## Deploy application normally
 	APP_ENV=prod APP_DEBUG=0 COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 	APP_ENV=prod APP_DEBUG=0 php bin/console doctrine:database:create --if-not-exists --no-interaction
 	APP_ENV=prod APP_DEBUG=0 php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
@@ -101,8 +101,8 @@ deploy:
 	APP_ENV=prod APP_DEBUG=0 php bin/console tailwind:build --minify
 	APP_ENV=prod APP_DEBUG=0 php bin/console asset-map:compile
 
-# Déploiement avec backup DB
-deploy-safe:
+.PHONY: deploy-safe
+deploy-safe: ## Deploying app with database backup firstly
 	@echo "=== Sauvegarde de la base de données avant migrations ==="
 	mkdir -p backups
 	mysqldump -u $(DB_USER) -p$(DB_PASSWORD) $(DB_NAME) > backups/db_$$(date +%F_%H-%M-%S).sql
