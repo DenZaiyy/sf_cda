@@ -39,7 +39,7 @@ services:
             - database_data:/var/lib/mysql:rw
 
     mailer:
-        image: mailhog/mailhog:latest
+        image: axllent/mailpit:latest
         container_name: mailer
         restart: always
         ports:
