@@ -25,12 +25,19 @@ help: ## Show this help
 	$(call banner,$(YELLOW),Available targets:)
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
+.PHONY: cache
+cache: ## Clear the cache of application
+	$(call banner,$(RED),Clearing the cache of application...)
+	php bin/console cache:clear
+
 .PHONY: up
 up: ## Starting docker container
+	$(call banner,$(RED),Starting docker containers...)
 	docker-compose up -d
 
 .PHONY: down
 down: ## Stopping docker
+	$(call banner,$(RED),Stopping docker containers...)
 	docker-compose down
 
 .PHONY: tw
