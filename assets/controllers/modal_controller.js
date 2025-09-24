@@ -117,6 +117,14 @@ export default class extends Controller {
         }
     }
 
+    // Handle success messages and auto-close modal
+    handleSuccess(event) {
+        // Auto-close modal after 2 seconds when success message is shown
+        setTimeout(() => {
+            this.closeModal();
+        }, 2000);
+    }
+
     // Getter for current state
     get isModalOpen() {
         return this.isOpen;
