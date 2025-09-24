@@ -6,11 +6,11 @@ services:
         container_name: frankenphp
         restart: always
         ports:
-            - "8080:80"
+            - "80:80"
             - "443:443"
             - "443:443/udp"
         networks:
-            - sf-network
+            - sf-prod-network
         volumes:
             - ./:/app
             - caddy_data:/data
@@ -32,9 +32,9 @@ services:
         ports:
             - "33336:3306"
         networks:
-            - sf-network
+            - sf-prod-network
         volumes:
-            - database_data:/var/lib/mysql:rw
+            - database-prod_data:/var/lib/mysql:rw
 
     mailer:
         image: axllent/mailpit:latest
@@ -44,13 +44,13 @@ services:
             - "1025:1025" # SMTP
             - "8025:8025" # Web UI
         networks:
-            - sf-network
+            - sf-prod-network
 
 volumes:
     caddy_data:
     caddy_config:
-    database_data:
+    database-prod_data:
 
 networks:
-    sf-network:
+    sf-prod-network:
         driver: bridge
