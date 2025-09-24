@@ -42,8 +42,12 @@ class OAuthIntegrationTest extends WebTestCase
     {
         if (!isset($this->entityManager)) {
             $container = $this->getMyContainer();
-            $this->entityManager = $container->get(EntityManagerInterface::class);
-            $this->userRepository = $container->get(UserRepository::class);
+            /** @var EntityManagerInterface $entityManager */
+            $entityManager = $container->get(EntityManagerInterface::class);
+            /** @var UserRepository $userRepository */
+            $userRepository = $container->get(UserRepository::class);
+            $this->entityManager = $entityManager;
+            $this->userRepository = $userRepository;
             $this->cleanDatabase();
         }
     }
@@ -65,6 +69,7 @@ class OAuthIntegrationTest extends WebTestCase
         $this->assertResponseStatusCodeSame(302);
 
         $location = $client->getResponse()->headers->get('Location');
+        $this->assertNotNull($location);
         $this->assertStringContainsString('accounts.google.com', $location);
         $this->assertStringContainsString('oauth2', $location);
     }
@@ -112,11 +117,16 @@ class OAuthIntegrationTest extends WebTestCase
         $oauthClient->method('getAccessToken')->willReturn($accessToken);
         $oauthClient->method('fetchUserFromToken')->willReturn($googleUser);
 
+        /** @var \Symfony\Component\Routing\RouterInterface $router */
+        $router = $container->get('router');
+        /** @var OAuthRegistrationService $registrationService */
+        $registrationService = $container->get(\App\Security\OAuthRegistrationService::class);
+        
         $authenticator = new GoogleAuthenticator(
             $clientRegistry,
-            $container->get('router'),
+            $router,
             $this->userRepository,
-            $container->get(\App\Security\OAuthRegistrationService::class)
+            $registrationService
         );
 
         $passport = $authenticator->authenticate(new \Symfony\Component\HttpFoundation\Request());
@@ -143,11 +153,16 @@ class OAuthIntegrationTest extends WebTestCase
         $oauthClient->method('getAccessToken')->willReturn($accessToken);
         $oauthClient->method('fetchUserFromToken')->willReturn($githubUser);
 
+        /** @var \Symfony\Component\Routing\RouterInterface $router */
+        $router = $container->get('router');
+        /** @var OAuthRegistrationService $registrationService */
+        $registrationService = $container->get(\App\Security\OAuthRegistrationService::class);
+        
         $authenticator = new GithubAuthenticator(
             $clientRegistry,
-            $container->get('router'),
+            $router,
             $this->userRepository,
-            $container->get(\App\Security\OAuthRegistrationService::class)
+            $registrationService
         );
 
         $passport = $authenticator->authenticate(new \Symfony\Component\HttpFoundation\Request());

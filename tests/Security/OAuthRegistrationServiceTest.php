@@ -41,7 +41,7 @@ class OAuthRegistrationServiceTest extends TestCase
             ->expects($this->once())
             ->method('add')
             ->with(
-                $this->callback(fn(User $user): bool => $user->getEmail() === 'google@example.com'
+                $this->callback(fn (User $user): bool => $user->getEmail() === 'google@example.com'
                     && $user->getGoogleId() === 'google-123'
                     && $user->getGithubId() === null),
                 true
@@ -72,7 +72,7 @@ class OAuthRegistrationServiceTest extends TestCase
             ->expects($this->once())
             ->method('add')
             ->with(
-                $this->callback(fn(User $user): bool => $user->getEmail() === 'github@example.com'
+                $this->callback(fn (User $user): bool => $user->getEmail() === 'github@example.com'
                     && $user->getGithubId() === 'github-456'
                     && $user->getGoogleId() === null),
                 true
@@ -131,7 +131,7 @@ class OAuthRegistrationServiceTest extends TestCase
             ->expects($this->once())
             ->method('add')
             ->with(
-                $this->callback(fn(User $user): bool => $user->getEmail() === 'numeric@example.com'
+                $this->callback(fn (User $user): bool => $user->getEmail() === 'numeric@example.com'
                     && $user->getGoogleId() === '12345'),
                 true
             );
@@ -158,7 +158,7 @@ class OAuthRegistrationServiceTest extends TestCase
             ->expects($this->once())
             ->method('add')
             ->with(
-                $this->callback(fn(User $user): bool => $user->getEmail() === 'numeric@github.com'
+                $this->callback(fn (User $user): bool => $user->getEmail() === 'numeric@github.com'
                     && $user->getGithubId() === '67890'),
                 true
             );
@@ -185,7 +185,7 @@ class OAuthRegistrationServiceTest extends TestCase
             ->expects($this->once())
             ->method('add')
             ->with(
-                $this->callback(fn(User $user): bool => $user->getEmail() === 'array@example.com'
+                $this->callback(fn (User $user): bool => $user->getEmail() === 'array@example.com'
                     && $user->getGoogleId() === null),
                 true
             );
