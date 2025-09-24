@@ -42,6 +42,11 @@ final class ProfileController extends AbstractController
 
             if (!is_string($newPassword) || !is_string($currentPassword)) {
                 $this->addFlash('danger', 'Current password is wrong.');
+                if ($request->headers->get('Turbo-Frame')) {
+                    return $this->render('profile/change-password.html.twig', [
+                        'form' => $form->createView(),
+                    ]);
+                }
                 return $this->redirectToRoute('app.profile.change.password');
             }
 
@@ -53,8 +58,19 @@ final class ProfileController extends AbstractController
 
                 $this->addFlash('success', 'Your password has been changed successfully.');
                 $mailerService->sendAdminNotification("Password changed", sprintf("L'utilisateur %s a changer son mot de passe", $currentUser->getEmail()));
+                
+                if ($request->headers->get('Turbo-Frame')) {
+                    return $this->render('profile/change-password.html.twig', [
+                        'form' => $this->createForm(ChangePasswordForm::class, $currentUser)->createView(),
+                    ]);
+                }
             } else {
                 $this->addFlash('danger', 'Your current password is incorrect.');
+                if ($request->headers->get('Turbo-Frame')) {
+                    return $this->render('profile/change-password.html.twig', [
+                        'form' => $form->createView(),
+                    ]);
+                }
             }
 
             return $this->redirectToRoute('app.profile.index');

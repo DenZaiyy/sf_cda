@@ -9,9 +9,26 @@
 
         <div class="mt-5">
             <h2 class="mb-2">Change your password</h2>
-            <turbo-frame id="profile-change-password">
-                <a href="{{ path('app.profile.change.password') }}" class="hover:underline text-blue-700 hover:text-blue-400 transition-all duration-200">here</a>
-            </turbo-frame>
+
+            <twig:Modal id="change-password-modal" title="Change Password" size="lg" :closable="true">
+                <twig:block name="trigger">
+                    <button type="button"
+                            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                            data-action="click->modal#openModal">
+                        Change Password
+                    </button>
+                </twig:block>
+                <twig:block name="content">
+                    <turbo-frame id="profile-change-password"
+                                 data-modal-target="turboFrame"
+                                 data-src="{{ path('app.profile.change.password') }}">
+                        <div class="flex items-center justify-center py-8">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                            <span class="ml-2 text-gray-600">Loading form...</span>
+                        </div>
+                    </turbo-frame>
+                </twig:block>
+            </twig:Modal>
         </div>
     </div>
 {% endblock %}

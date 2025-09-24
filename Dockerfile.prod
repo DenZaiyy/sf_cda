@@ -2,6 +2,7 @@ FROM dunglas/frankenphp
 
 ENV FRANKENPHP_CONFIG="worker ./public/index.php"
 ENV APP_RUNTIME=Runtime\\FrankenPhpSymfony\\Runtime
+ENV SERVER_NAME=denz.ovh
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
 
@@ -12,8 +13,5 @@ RUN install-php-extensions \
   zip \
   opcache \
   apcu
-
-RUN pecl install xdebug \
-  && docker-php-ext-enable xdebug
 
 WORKDIR /app
